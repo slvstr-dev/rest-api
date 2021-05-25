@@ -1,5 +1,5 @@
 /* Helper function to handle each route async */
-const handleRouteAsync = (callback) => {
+exports.asyncHandler = (callback) => {
     return async (req, res, next) => {
         try {
             await callback(req, res, next);
@@ -8,5 +8,3 @@ const handleRouteAsync = (callback) => {
         }
     };
 };
-
-module.exports = handleRouteAsync;

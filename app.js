@@ -14,6 +14,9 @@ const enableGlobalErrorLogging =
 // create the Express app
 const app = express();
 
+// Setup request body JSON parsing.
+app.use(express.json());
+
 // setup morgan which gives us http request logging
 app.use(morgan("dev"));
 
@@ -21,6 +24,7 @@ app.use(morgan("dev"));
 (async () => {
     try {
         await sequelize.authenticate();
+
         console.log("Connection to the database successful!");
     } catch (error) {
         console.error("Error connecting to the database: ", error);

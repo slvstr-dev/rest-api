@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { handleRouteAsync } = require("../functions/index");
+const { handleRouteAsync } = require("../middleware/async-handler");
 
 /**
  * GET routes
