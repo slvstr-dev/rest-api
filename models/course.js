@@ -5,7 +5,13 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
     class Course extends Model {
         static associate(models) {
-            this.belongsTo(models.User);
+            this.belongsTo(models.User, {
+                as: "user",
+                foreignKey: {
+                    fieldName: "userId",
+                    allowNull: false,
+                },
+            });
         }
     }
 

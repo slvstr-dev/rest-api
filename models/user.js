@@ -4,7 +4,13 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
     class User extends Model {
         static associate(models) {
-            this.hasMany(models.Course);
+            this.hasMany(models.Course, {
+                as: "user",
+                foreignKey: {
+                    fieldName: "userId",
+                    allowNull: false,
+                },
+            });
         }
     }
 
@@ -34,6 +40,9 @@ module.exports = (sequelize, DataTypes) => {
                 validate: {
                     notEmpty: {
                         msg: 'Please provide a value for "email address".',
+                    },
+                    isEmail: {
+                        msg: "Please provide a correctly formatted email address.",
                     },
                 },
             },

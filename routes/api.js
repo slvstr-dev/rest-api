@@ -3,6 +3,7 @@ const router = express.Router();
 
 const { asyncHandler } = require("../middleware/async-handler");
 const { User } = require("../models");
+const { Course } = require("../models");
 const { authenticateUser } = require("../middleware/auth-user");
 
 /**
@@ -16,11 +17,23 @@ router.get("/users", authenticateUser, (req, res, next) => {
     });
 });
 
-router.get("/courses", (req, res, next) => {
-    res.status(200).json({
-        message: "GET /courses",
-    });
-});
+router.get(
+    "/courses",
+    asyncHandler(async (req, res, next) => {
+        const courses = await Course.findAll({
+            include: [
+                {
+                    model: User,
+                    as: "user",
+                },
+            ],
+        });
+
+        res.status(200).json({
+            courses,
+        });
+    })
+);
 
 router.get("/courses/:id", (req, res, next) => {
     res.status(200).json({
