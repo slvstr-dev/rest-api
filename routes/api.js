@@ -35,11 +35,26 @@ router.get(
     })
 );
 
-router.get("/courses/:id", (req, res, next) => {
-    res.status(200).json({
-        message: `GET /courses/${req.params.id}`,
-    });
-});
+router.get(
+    "/courses/:id",
+    asyncHandler(async (req, res, next) => {
+        const course = await Course.findOne({
+            where: {
+                id: req.params.id,
+            },
+            include: [
+                {
+                    model: User,
+                    as: "user",
+                },
+            ],
+        });
+
+        res.status(200).json({
+            course,
+        });
+    })
+);
 
 /**
  * POST routes
