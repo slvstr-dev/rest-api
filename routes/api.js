@@ -12,9 +12,10 @@ const { authenticateUser } = require("../middleware/auth-user");
 router.get("/users", authenticateUser, (req, res, next) => {
     const user = req.currentUser;
 
-    res.status(200).json({
-        username: user.emailAddress,
-    });
+    // Delete password from user object
+    delete user.dataValues.password;
+
+    res.status(200).json({ user });
 });
 
 router.get(
@@ -25,8 +26,12 @@ router.get(
                 {
                     model: User,
                     as: "user",
+                    attributes: {
+                        exclude: ["password", "createdAt", "updatedAt"],
+                    },
                 },
             ],
+            attributes: { exclude: ["createdAt", "updatedAt"] },
         });
 
         res.status(200).json({
@@ -46,8 +51,12 @@ router.get(
                 {
                     model: User,
                     as: "user",
+                    attributes: {
+                        exclude: ["password", "createdAt", "updatedAt"],
+                    },
                 },
             ],
+            attributes: { exclude: ["createdAt", "updatedAt"] },
         });
 
         res.status(200).json({
@@ -110,12 +119,17 @@ router.put(
     asyncHandler(async (req, res, next) => {
         const query = Object.keys(req.body).length > 0;
         const course = await Course.findByPk(req.params.id);
+        const courseAuthor = course.id === req.currentUser.id;
 
         if (course && query) {
             try {
-                await course.update(req.body);
+                if (courseAuthor) {
+                    await course.update(req.body);
 
-                res.status(204).end();
+                    res.status(204).end();
+                } else {
+                    res.status(403).end();
+                }
             } catch (error) {
                 if (error.name === "SequelizeValidationError") {
                     const errors = error.errors.map((err) => err.message);
@@ -139,11 +153,16 @@ router.delete(
     authenticateUser,
     asyncHandler(async (req, res, next) => {
         const course = await Course.findByPk(req.params.id);
+        const courseAuthor = course.id === req.currentUser.id;
 
         if (course) {
-            await course.destroy();
+            if (courseAuthor) {
+                await course.destroy();
 
-            res.status(204).end();
+                res.status(204).end();
+            } else {
+                res.status(403).end();
+            }
         } else {
             next();
         }

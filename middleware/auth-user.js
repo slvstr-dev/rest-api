@@ -12,6 +12,7 @@ exports.authenticateUser = async (req, res, next) => {
     if (credentials) {
         const user = await User.findOne({
             where: { emailAddress: credentials.name },
+            attributes: { exclude: ["createdAt", "updatedAt"] },
         });
 
         if (user) {
