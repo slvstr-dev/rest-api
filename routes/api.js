@@ -106,9 +106,10 @@ router.post(
 router.put(
     "/courses/:id",
     asyncHandler(async (req, res, next) => {
-        let course = await Course.findByPk(req.params.id);
+        const query = Object.keys(req.body).length > 0;
+        const course = await Course.findByPk(req.params.id);
 
-        if (course) {
+        if (course && query) {
             try {
                 await course.update(req.body);
 
