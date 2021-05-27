@@ -83,6 +83,7 @@ router.post(
 
 router.post(
     "/courses",
+    authenticateUser,
     asyncHandler(async (req, res, next) => {
         try {
             const course = await Course.create(req.body);
@@ -105,6 +106,7 @@ router.post(
  */
 router.put(
     "/courses/:id",
+    authenticateUser,
     asyncHandler(async (req, res, next) => {
         const query = Object.keys(req.body).length > 0;
         const course = await Course.findByPk(req.params.id);
@@ -134,6 +136,7 @@ router.put(
  */
 router.delete(
     "/courses/:id",
+    authenticateUser,
     asyncHandler(async (req, res, next) => {
         const course = await Course.findByPk(req.params.id);
 
