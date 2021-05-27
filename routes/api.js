@@ -81,18 +81,58 @@ router.post(
     })
 );
 
-router.post("/courses", (req, res, next) => {
-    res.status(200).redirect(`/courses/:id`);
-});
+router.post(
+    "/courses",
+    asyncHandler(async (req, res, next) => {
+        try {
+            const course = await Course.create(req.body);
+
+            res.status(201).location(`/courses/${course.id}`).end();
+        } catch (error) {
+            if (
+                error.name === "SequelizeValidationError" ||
+                error.name == "SequelizeUniqueConstraintError"
+            ) {
+                const errors = error.errors.map((err) => err.message);
+
+                res.status(400).json({ errors });
+            } else {
+                throw error;
+            }
+        }
+    })
+);
 
 /**
  * PUT routes
  */
-router.put("/courses/:id", (req, res, next) => {
-    res.status(204).json({
-        message: `PUT /courses/${req.params.id}`,
-    });
-});
+router.put(
+    "/courses/:id",
+    asyncHandler(async (req, res, next) => {
+        const course = await Course.findByPk(req.params.id);
+
+        if (course) {
+            try {
+                await course.update(req.body);
+
+                res.status(204).end();
+            } catch (error) {
+                if (
+                    error.name === "SequelizeValidationError" ||
+                    error.name == "SequelizeUniqueConstraintError"
+                ) {
+                    const errors = error.errors.map((err) => err.message);
+
+                    res.status(400).json({ errors });
+                } else {
+                    throw error;
+                }
+            }
+        } else {
+            next();
+        }
+    })
+);
 
 /**
  * DELETE routes
