@@ -89,10 +89,7 @@ router.post(
 
             res.status(201).location(`/courses/${course.id}`).end();
         } catch (error) {
-            if (
-                error.name === "SequelizeValidationError" ||
-                error.name == "SequelizeUniqueConstraintError"
-            ) {
+            if (error.name === "SequelizeValidationError") {
                 const errors = error.errors.map((err) => err.message);
 
                 res.status(400).json({ errors });
@@ -109,7 +106,7 @@ router.post(
 router.put(
     "/courses/:id",
     asyncHandler(async (req, res, next) => {
-        const course = await Course.findByPk(req.params.id);
+        let course = await Course.findByPk(req.params.id);
 
         if (course) {
             try {
@@ -117,10 +114,7 @@ router.put(
 
                 res.status(204).end();
             } catch (error) {
-                if (
-                    error.name === "SequelizeValidationError" ||
-                    error.name == "SequelizeUniqueConstraintError"
-                ) {
+                if (error.name === "SequelizeValidationError") {
                     const errors = error.errors.map((err) => err.message);
 
                     res.status(400).json({ errors });
@@ -137,10 +131,19 @@ router.put(
 /**
  * DELETE routes
  */
-router.delete("/courses/:id", (req, res, next) => {
-    res.status(204).json({
-        message: `DELETE /courses/${req.params.id}`,
-    });
-});
+router.delete(
+    "/courses/:id",
+    asyncHandler(async (req, res, next) => {
+        const course = await Course.findByPk(req.params.id);
+
+        if (course) {
+            await course.destroy();
+
+            res.status(204).end();
+        } else {
+            next();
+        }
+    })
+);
 
 module.exports = router;
