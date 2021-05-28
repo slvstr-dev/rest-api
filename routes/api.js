@@ -74,7 +74,7 @@ router.post(
         try {
             await User.create(req.body);
 
-            res.status(201).redirect("/");
+            res.status(201).location("/").end();
         } catch (error) {
             if (
                 error.name === "SequelizeValidationError" ||
